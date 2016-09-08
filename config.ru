@@ -1,5 +1,7 @@
-use Rack::Static,
-  urls: ['/images', '/js', '/css'],
+require 'rack/coffee'
+
+use Rack::Coffee,
+  urls: ['/images', '/javascripts', '/stylesheets'],
   root: 'public'
 
 run lambda { |env|
