@@ -1,4 +1,4 @@
-source 'https://rubygems.org'
-
-gem 'rack'
-gem 'rack-coffee'
+gem 'sinatra'
+gem 'slim'
+gem 'sass'
+gem 'coffee-script'
