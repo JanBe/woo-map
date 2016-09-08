@@ -4,4 +4,6 @@ this.initMap = ->
       lat: 28.3
       lng: 20.8
     zoom: 3
+    disableDefaultUI: true,
+    zoomControl: true
   )
