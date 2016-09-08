@@ -1,3 +1,3 @@
-require 'sinatra'
-require 'slim'
+require './application'
+
 run Sinatra::Application
