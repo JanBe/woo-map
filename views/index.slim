@@ -1,7 +1,7 @@
 html
   head
     script src='/map.js'
-    script src='https://maps.googleapis.com/maps/api/js?key=KEY&callback=initMap' async=true defer=true
+    script src='https://maps.googleapis.com/maps/api/js?key=#{ENV['GOOGLE_MAPS_API_KEY']}&callback=initMap' async=true defer=true
     link href='/map.css' rel='stylesheet' type='text/css'
   body
     #map

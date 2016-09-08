@@ -1,4 +1,5 @@
 gem 'sinatra'
+gem 'rack-env'
 gem 'slim'
 gem 'sass'
 gem 'coffee-script'
