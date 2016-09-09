@@ -38,8 +38,8 @@ get '/sessions' do
       max_crash_power: session['maxCrashPower'],
       user_first_name: session['user_name'],
       user_last_name: session['user_lastname'],
-      created: session['created'],
-      time: session['time'],
+      session_posted: Time.at(session['created']),
+      session_started: Time.at(session['time']),
       spot: find_spot(session['_spot']['$id'])
     }
   end.to_json
