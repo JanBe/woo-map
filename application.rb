@@ -57,8 +57,8 @@ def find_spot(id)
     {
       name: spot['properties']['name'],
       location: {
-        lat: spot['geometry']['coordinates'][0],
-        lon: spot['geometry']['coordinates'][1]
+        lat: spot['geometry']['coordinates'][1],
+        lng: spot['geometry']['coordinates'][0]
       }
     }
   else
