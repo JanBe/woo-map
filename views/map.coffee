@@ -17,3 +17,4 @@
         map: map,
         title: session.user_last_name
       )
+    setTimeout(loadSessions, 30000)
