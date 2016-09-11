@@ -34,16 +34,35 @@ get '/sessions' do
 
   JSON(HTTPI.post(request).body)['items'].collect do |session|
     {
-      max_air_time: session['maxAirTime'],
-      highest_air: session['highestAir'],
+      max_airtime: format_duration(session['maxAirTime']),
+      highest_jump: session['highestAir'],
+      total_height: session['totalHeight'],
+      total_airtime: format_duration(session['totalAirTime']),
+      duration: format_duration(session['duration']),
+      number_of_jumps: session['numberOfAirs'],
+      description: session['name'],
       max_crash_power: session['maxCrashPower'],
-      user_first_name: session['user_name'],
-      user_last_name: session['user_lastname'],
-      session_posted: Time.at(session['created']),
-      session_started: Time.at(session['time']),
-      spot: find_spot(session['_spot']['$id'])
+      user_name: "#{session['user_name']} #{session['user_lastname']}",
+      session_posted: Time.at(session['created']).strftime('%a %b %d, %k:%M'),
+      session_finished: Time.at(session['time']).strftime('%a %b %d, %k:%M'),
+      spot: find_spot(session['_spot']['$id']),
+      likes: session['totallikes'],
+      comments: session['totalcomments'],
+      user_pictures: session['user_pictures'].collect {|p| {p['type'] => p['url']} }.reduce(&:merge),
+      picture: session['_pictures'].any? ? session['_pictures'][0]['url'] : nil
     }
   end.to_json
+end
+
+def format_duration(seconds)
+  time = Time.new(2016,01,01,0,0) + seconds
+  if seconds < 60
+    time.strftime('%-S.%1Ns')
+  elsif seconds < 3600
+    time.strftime('%-Mm %-Ss')
+  else
+    time.strftime('%-kh %-Mm %-Ss')
+  end
 end
 
 def token
