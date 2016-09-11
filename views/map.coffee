@@ -11,10 +11,17 @@
 
 @loadSessions = (map) ->
   $.get '/sessions', (sessions) ->
+    marker = {
+      url: 'images/woopin.png',
+      size: new google.maps.Size(50, 75),
+      scaledSize: new google.maps.Size(25, 38)
+    }
+
     for session in sessions
       new google.maps.Marker(
         position: session.spot.location,
         map: map,
-        title: session.user_last_name
+        title: session.user_last_name,
+        icon: marker
       )
     setTimeout(loadSessions, 30000)
