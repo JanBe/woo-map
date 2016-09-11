@@ -7,6 +7,7 @@
     disableDefaultUI: true,
     zoomControl: true
   )
+  setDayNightCycleOverlay(map)
   loadSessions(map)
 
 @loadSessions = (map) ->
@@ -25,3 +26,7 @@
         icon: marker
       )
     setTimeout(loadSessions, 30000)
+
+@setDayNightCycleOverlay = (map) ->
+  nite.init(map)
+  setTimeout(setDayNightCycleOverlay, 30000)
