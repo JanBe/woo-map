@@ -4,6 +4,7 @@ require 'sass'
 require 'coffee-script'
 require 'rack/env'
 require 'httpi'
+require 'pry'
 
 use Rack::Env unless ENV['RACK_ENV'] == 'production'
 
