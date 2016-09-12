@@ -5,7 +5,8 @@
       lng: 20.8
     zoom: 3
     disableDefaultUI: true,
-    zoomControl: true
+    zoomControl: true,
+    mapTypeControl: true
   )
   setDayNightCycleOverlay(map)
   loadSessions(map)
