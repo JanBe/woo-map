@@ -19,6 +19,7 @@
     anchor: new google.maps.Point(12.5, 38)
   }
   sessionDetailsWindow = initializeSessionDetailsWindow()
+  oms = new OverlappingMarkerSpiderfier(map)
 
   $.get '/sessions', (sessions) ->
     for session in sessions
@@ -30,9 +31,10 @@
         anchorPoint: new google.maps.Point(0, -38),
         session: session
       )
-      google.maps.event.addListener marker, 'click', ->
-        sessionDetailsWindow.setContent(sessionDetails(this.session))
-        sessionDetailsWindow.open(map, this)
+      oms.addListener 'click', (clickedMarker) ->
+        sessionDetailsWindow.setContent(sessionDetails(clickedMarker.session))
+        sessionDetailsWindow.open(map, clickedMarker)
+      oms.addMarker(marker)
 
     setTimeout(loadSessions, 30000)
 
