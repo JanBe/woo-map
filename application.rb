@@ -22,36 +22,46 @@ end
 
 get '/sessions' do
   content_type :json
-  request = HTTPI::Request.new(
-    url: "#{ENV['WOO_PRODUCTION_API_URL']}/session/activity",
-    body: {
-      token: token,
-      offset: 0,
-      pageSize: 100,
-      target: 'community'
-    }
-  )
+  sessions = []
+  token = get_token
 
-  JSON(HTTPI.post(request).body)['items'].collect do |session|
-    {
-      max_airtime: format_duration(session['maxAirTime']),
-      highest_jump: session['highestAir'],
-      total_height: session['totalHeight'],
-      total_airtime: format_duration(session['totalAirTime']),
-      duration: format_duration(session['duration']),
-      number_of_jumps: session['numberOfAirs'],
-      description: session['name'],
-      max_crash_power: session['maxCrashPower'],
-      user_name: "#{session['user_name']} #{session['user_lastname']}",
-      session_posted: Time.at(session['created']).strftime('%a %b %d, %k:%M'),
-      session_finished: Time.at(session['time']).strftime('%a %b %d, %k:%M'),
-      spot: find_spot(session['_spot']['$id']),
-      likes: session['totallikes'],
-      comments: session['totalcomments'],
-      user_pictures: session['user_pictures'].collect {|p| {p['type'] => p['url']} }.reduce(&:merge),
-      picture: session['_pictures'].any? ? session['_pictures'][0]['url'] : nil
-    }
-  end.to_json
+  (0..100).step(15).each do |offset|
+    request = HTTPI::Request.new(
+      url: "#{ENV['WOO_PRODUCTION_API_URL']}/session/activity",
+      body: {
+        token: token,
+        offset: offset,
+        pageSize: 15,
+        target: 'community'
+      }
+    )
+    api_sessions = JSON(HTTPI.post(request).body)['items']
+
+    sessions.push(*api_sessions.collect do |session|
+      {
+        max_airtime: format_duration(session['maxAirTime']),
+        highest_jump: session['highestAir'],
+        total_height: session['totalHeight'],
+        total_airtime: format_duration(session['totalAirTime']),
+        duration: format_duration(session['duration']),
+        number_of_jumps: session['numberOfAirs'],
+        description: session['name'],
+        max_crash_power: session['maxCrashPower'],
+        user_name: "#{session['user_name']} #{session['user_lastname']}",
+        session_posted: Time.at(session['created']).strftime('%a %b %d, %k:%M'),
+        session_finished: Time.at(session['time']).strftime('%a %b %d, %k:%M'),
+        spot: find_spot(session['_spot']['$id']),
+        likes: session['totallikes'],
+        comments: session['totalcomments'],
+        user_pictures: session['user_pictures'].collect {|p| {p['type'] => p['url']} }.reduce(&:merge),
+        picture: session['_pictures'].any? ? session['_pictures'][0]['url'] : nil
+      }
+    end)
+
+    # Stop if the oldest session is older than 12 hours
+    break if api_sessions.last['time'] < (Time.now - 43200).to_i
+  end
+  sessions.to_json
 end
 
 def format_duration(seconds)
@@ -65,7 +75,7 @@ def format_duration(seconds)
   end
 end
 
-def token
+def get_token
   request = HTTPI::Request.new(url: "#{ENV['WOO_TOKEN_APP_URL']}/tokens/latest")
   response = HTTPI.get(request)
   JSON(response.body)['access_token']
