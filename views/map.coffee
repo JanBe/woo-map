@@ -43,7 +43,11 @@
   )
 
 @sessionDetails = (session) ->
-  "<div class='session-details'>
+  "<div class='session-details'>" +
+    (if session.user_pictures? && session.user_pictures.user? then "
+    <div class='session-details--profile-picture'>
+      <img src='#{session.user_pictures.user}'></img
+    <div>" else '') + "
     <h1>#{session.user_name}</h1>
     <div class='session-details--meta'>
       <div class='session-details--description'>
