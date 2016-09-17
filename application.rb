@@ -1,10 +1,10 @@
 Bundler.require :default
+require './config/environments'
 require './lib/json'
 
 Dir['./models/**/*.rb'].each { |file| require file }
 Dir['./serializers/**/*.rb'].each { |file| require file }
 
-set :database_file, 'config/database.yml'
 use Rack::Env unless ENV['RACK_ENV'] == 'production'
 
 get '/' do

@@ -6,8 +6,4 @@ development:
   host: localhost
 
 production:
-  adapter: postgresql
-  database: woo-map-production
-  username: <%= ENV['PG_USER'] %>
-  password: <%= ENV['PG_PASS'] %>
-  host: localhost
+  url: <%= ENV['DATABASE_URL'] %>
