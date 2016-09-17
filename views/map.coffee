@@ -25,7 +25,7 @@
       marker = new google.maps.Marker(
         position: session.spot.location,
         map: map,
-        title: session.user_last_name,
+        title: session.user_name,
         icon: icon
         anchorPoint: new google.maps.Point(0, -38),
         session: session
@@ -43,10 +43,13 @@
   )
 
 @sessionDetails = (session) ->
+  user_picture = session.pictures.filter((pic) -> pic.type == 'user')[0]
+  session_picture = session.pictures.filter((pic) -> pic.type == 'session')[0]
+
   "<div class='session-details'>" +
-    (if session.user_pictures? && session.user_pictures.user? then "
+    (if user_picture? then "
     <div class='session-details--profile-picture'>
-      <img src='#{session.user_pictures.user}'></img
+      <img src='#{user_picture.url}'></img
     <div>" else '') + "
     <h1>#{session.user_name}</h1>
     <div class='session-details--meta'>
@@ -54,11 +57,11 @@
         <div>#{session.description}</div>
         <div>at #{session.spot.name}</div>
       </div>
-      <div class='session-details--location'>#{session.session_finished}</div>
+      <div class='session-details--location'>#{session.finished_at}</div>
     </div>" +
-    (if session.picture? then "
+    (if session_picture? then "
       <div class='session-details--picture'>
-        <img src='#{session.picture}'></img>
+        <img src='#{session_picture.url}'></img>
       </div>"
     else '') + "
     <p>

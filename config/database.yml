@@ -1,0 +1,13 @@
+development:
+  adapter: postgresql
+  database: woo-map-development
+  username: <%= ENV['PG_USER'] %>
+  password: <%= ENV['PG_PASS'] %>
+  host: localhost
+
+development:
+  adapter: postgresql
+  database: woo-map-production
+  username: <%= ENV['PG_USER'] %>
+  password: <%= ENV['PG_PASS'] %>
+  host: localhost
