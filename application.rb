@@ -21,9 +21,25 @@ end
 
 get '/sessions' do
   content_type :json
+
+  load_spots
+  load_new_sessions
+
+  json Session.where('posted_at > ?', Time.now - 60 * 60 * 24)
+end
+
+def load_new_sessions
+  seconds_since_sessions_updated = Time.now - (Session.pluck(:updated_at).last || 60 * 60 * 24)
+  if seconds_since_sessions_updated > 900
+    load_new_sessions_since(Time.now - seconds_since_sessions_updated)
+    Session.last.touch
+  end
+end
+
+def load_new_sessions_since(break_time)
   token = get_token
 
-  api_sessions = (0..100).step(15).collect do |offset|
+  api_sessions = (0..200).step(15).collect do |offset|
     request = HTTPI::Request.new(
       url: "#{ENV['WOO_PRODUCTION_API_URL']}/session/activity",
       body: {
@@ -37,6 +53,8 @@ get '/sessions' do
   end.flatten!
 
   api_sessions.each do |api_session|
+    posted_at = Time.at(api_session['created']).to_datetime
+    break if posted_at < break_time
     Session.find_or_initialize_by(woo_id: api_session['_id']['$id']) do |session|
       session.max_airtime = api_session['maxAirTime']
       session.highest_jump = api_session['highestAir']
@@ -61,22 +79,21 @@ get '/sessions' do
       session.save
     end
   end
-
-  json Session.all
 end
 
-get '/load_spots' do
-  content_type :json
-  request = HTTPI::Request.new(url: "#{ENV['WOO_EXPLORE_URL']}/output.geojson")
-  spots = JSON(HTTPI.get(request).body).map do |api_spot|
-    Spot.find_or_initialize_by(woo_id: api_spot['id']) do |spot|
-      spot.name = api_spot['properties']['name']
-      spot.location_lng = api_spot['geometry']['coordinates'][0]
-      spot.location_lat = api_spot['geometry']['coordinates'][1]
-      spot.save
+def load_spots
+  if Spot.none? || (Spot.last.updated_at < (Time.now - 60 * 60 * 24))
+    request = HTTPI::Request.new(url: "#{ENV['WOO_EXPLORE_URL']}/output.geojson")
+    JSON(HTTPI.get(request).body).map do |api_spot|
+      Spot.find_or_initialize_by(woo_id: api_spot['id']) do |spot|
+        spot.name = api_spot['properties']['name']
+        spot.location_lng = api_spot['geometry']['coordinates'][0]
+        spot.location_lat = api_spot['geometry']['coordinates'][1]
+        spot.save
+      end
     end
+    Spot.last.touch
   end
-  json spots
 end
 
 def get_token
