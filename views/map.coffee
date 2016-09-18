@@ -1,46 +1,22 @@
-@initMap = ->
-  map = new (google.maps.Map)(document.getElementById('map'),
-    center:
-      lat: 28.3
-      lng: 20.8
-    zoom: 3
-    disableDefaultUI: true,
-    zoomControl: true,
-    mapTypeControl: true
-  )
-  setDayNightCycleOverlay(map)
-  loadSessions(map)
-
 @loadSessions = (map) ->
-  icon = {
-    url: 'images/woopin.png',
-    size: new google.maps.Size(50, 75),
-    scaledSize: new google.maps.Size(25, 38),
-    anchor: new google.maps.Point(12.5, 38)
-  }
-  sessionDetailsWindow = initializeSessionDetailsWindow()
+  icon = L.icon
+    iconUrl: 'images/woopin.png',
+    iconSize: [25, 38],
+    iconAnchor: [12.5, 38],
+    popupAnchor: [1, -38]
 
   $.get '/sessions', (sessions) ->
     for session in sessions
-      marker = new google.maps.Marker(
-        position: session.spot.location,
-        map: map,
-        title: session.user_name,
+      marker = L.marker(
+        [session.spot.location.lat, session.spot.location.lng],
         icon: icon
-        anchorPoint: new google.maps.Point(0, -38),
-        session: session
+      ).addTo(map)
+
+      marker.bindPopup(
+        sessionDetails(session),
+        maxWidth: 400
       )
-      google.maps.event.addListener marker, 'click', ->
-        sessionDetailsWindow.setContent(sessionDetails(this.session))
-        sessionDetailsWindow.open(map, this)
-
     setTimeout(loadSessions, 30000)
-
-@initializeSessionDetailsWindow = ->
-  new google.maps.InfoWindow(
-    content: 'Loading...',
-    maxWidth: 400
-  )
 
 @sessionDetails = (session) ->
   user_picture = session.pictures.filter((pic) -> pic.type == 'user')[0]
@@ -127,6 +103,13 @@
     </div>
   </div>"
 
-@setDayNightCycleOverlay = (map) ->
-  nite.init(map)
-  setTimeout(setDayNightCycleOverlay, 30000)
+$ ->
+  map = L.map('map').setView([28.3, 20.8], 3)
+
+  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    maxZoom: 18,
+    id: 'mapbox.streets-satellite',
+    accessToken: $('#map').data().mapboxAccessToken
+  }).addTo(map)
+  loadSessions(map)

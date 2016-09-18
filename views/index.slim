@@ -2,8 +2,8 @@ html
   head
     script src='https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js'
     script src='/map.js'
-    script src='https://cdn.rawgit.com/rossengeorgiev/nite-overlay/master/nite-overlay.js'
-    script src='https://maps.googleapis.com/maps/api/js?key=#{ENV['GOOGLE_MAPS_API_KEY']}&callback=initMap' async=true defer=true
+    script src='https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.js'
+    link href='https://unpkg.com/leaflet@1.0.0-rc.3/dist/leaflet.css' rel='stylesheet' type='text/css'
     link href='/map.css' rel='stylesheet' type='text/css'
   body
-    #map
+    #map data-mapbox-access-token="#{ENV['MAPBOX_ACCESS_TOKEN']}"
