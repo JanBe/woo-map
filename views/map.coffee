@@ -6,17 +6,35 @@
     popupAnchor: [1, -38]
 
   $.get '/sessions', (sessions) ->
+    markers = L.markerClusterGroup(
+      iconCreateFunction: clusterIcon
+    )
+
     for session in sessions
       marker = L.marker(
         [session.spot.location.lat, session.spot.location.lng],
         icon: icon
-      ).addTo(map)
-
+      )
       marker.bindPopup(
         sessionDetails(session),
         maxWidth: 400
       )
+      markers.addLayer(marker)
+
+    map.addLayer(markers)
     setTimeout(loadSessions, 30000)
+
+@clusterIcon = (cluster) ->
+  L.divIcon(
+    className: 'marker-cluster',
+    iconSize: L.point(32, 32),
+    html: "
+      <div class='marker-cluster--inner'>
+        <span class='marker-cluster--count'>
+          #{cluster.getChildCount()}
+        </span
+      </div>"
+  )
 
 @sessionDetails = (session) ->
   user_picture = session.pictures.filter((pic) -> pic.type == 'user')[0]
