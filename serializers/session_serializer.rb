@@ -4,7 +4,7 @@ class SessionSerializer < ActiveModel::Serializer
   attributes(*FORMAT_DURATION_ATTRIBUTES)
   attributes(*FORMAT_DATETIME_ATTRIBUTES)
 
-  attributes :woo_id, :highest_jump, :total_height, :number_of_jumps, :description, :max_crash_power, :likes, :comments, :user_name
+  attributes :woo_id, :highest_jump, :total_height, :number_of_jumps, :description, :max_crash_power, :likes, :comments, :user_name, :finished_at_timestamp
 
   has_many :pictures
   has_one :spot, foreign_key: 'spot_woo_id', primary_key: 'woo_id'
@@ -18,6 +18,10 @@ class SessionSerializer < ActiveModel::Serializer
   end
 
   private
+
+  def finished_at_timestamp
+    object.finished_at.to_i * 1000
+  end
 
   def format_duration(seconds)
     time = Time.new(2016,01,01,0,0) + seconds

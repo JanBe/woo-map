@@ -1,28 +1,36 @@
-@loadSessions = (map) ->
-  icon = L.icon
-    iconUrl: 'images/woopin.png',
-    iconSize: [25, 38],
-    iconAnchor: [12.5, 38],
-    popupAnchor: [1, -38]
-
-  $.get '/sessions', (sessions) ->
-    markers = L.markerClusterGroup(
-      iconCreateFunction: clusterIcon
-    )
-
+@loadSessions = (map, markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
+  # When requesting sessions, convert the timestamp from milliseconds to seconds
+  $.get '/sessions', ({last_updated_at: (lastUpdatedAt / 1000).toFixed()} if lastUpdatedAt?), (sessions) ->
     for session in sessions
       marker = L.marker(
         [session.spot.location.lat, session.spot.location.lng],
-        icon: icon
+        title: "#{session.user_name} @ #{session.spot.name} (#{session.finished_at})",
+        session_finished_at: new Date(session.finished_at_timestamp),
+        icon: L.icon
+          iconUrl: 'images/woopin.png',
+          iconSize: [25, 38],
+          iconAnchor: [12.5, 38],
+          popupAnchor: [1, -38]
       )
       marker.bindPopup(
         sessionDetails(session),
         maxWidth: 400
       )
-      markers.addLayer(marker)
+      markers.push(marker)
 
-    map.addLayer(markers)
-    setTimeout(loadSessions, 30000)
+    expiredMarkers = filterExpiredMarkers(markers)
+    markers = (marker for marker in markers when marker not in expiredMarkers)
+
+    markerClusterGroup.addLayers(markers)
+    markerClusterGroup.removeLayers(expiredMarkers)
+    map.addLayer(markerClusterGroup)
+
+    setTimeout((-> loadSessions(map, markers, markerClusterGroup, $.now())), 30000)
+
+# Markers of sessions that were posted more than 24 hours ago
+@filterExpiredMarkers = (markers) ->
+  markers.filter (marker) ->
+      marker.options.session_finished_at < new Date($.now() - 1000 * 60 * 60 * 24)
 
 @clusterIcon = (cluster) ->
   L.divIcon(
@@ -123,11 +131,11 @@
 
 $ ->
   map = L.map('map').setView([28.3, 20.8], 3)
-
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
     attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
     maxZoom: 18,
     id: 'mapbox.streets-satellite',
     accessToken: $('#map').data().mapboxAccessToken
   }).addTo(map)
+
   loadSessions(map)

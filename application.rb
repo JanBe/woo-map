@@ -25,7 +25,8 @@ get '/sessions' do
   load_spots
   load_new_sessions
 
-  json Session.where('posted_at > ?', Time.now - 60 * 60 * 24)
+  last_updated_at = Time.at(params[:last_updated_at].to_i) if params[:last_updated_at].present?
+  json Session.where('posted_at > ?', last_updated_at || (Time.now - 60 * 60 * 24))
 end
 
 def load_new_sessions
