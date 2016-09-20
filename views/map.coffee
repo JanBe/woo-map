@@ -25,7 +25,8 @@
     markerClusterGroup.removeLayers(expiredMarkers)
     map.addLayer(markerClusterGroup)
 
-    setTimeout((-> loadSessions(map, markers, markerClusterGroup, $.now())), 30000)
+    lastUpdatedAt = $.now()
+    setTimeout((-> loadSessions(map, markers, markerClusterGroup, lastUpdatedAt)), 30000)
 
 # Markers of sessions that were posted more than 24 hours ago
 @filterExpiredMarkers = (markers) ->
