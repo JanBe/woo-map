@@ -138,4 +138,5 @@ $ ->
     accessToken: $('#map').data().mapboxAccessToken
   }).addTo(map)
 
+  map.invalidateSize.bind(map)
   loadSessions(map)
