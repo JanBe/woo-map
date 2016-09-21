@@ -58,9 +58,9 @@
     <div class='session-details--meta'>
       <div class='session-details--description'>
         <div>#{session.description}</div>
-        <div>at #{session.spot.name}</div>
+        <span class='session-details--spot'>at #{session.spot.name}</span>
       </div>
-      <div class='session-details--location'>#{session.finished_at}</div>
+      <span class='session-details--finished-at'>#{session.finished_at}</span>
     </div>" +
     (if session_picture? then "
       <div class='session-details--picture'>
