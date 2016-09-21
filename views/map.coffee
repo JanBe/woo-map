@@ -132,7 +132,7 @@
 $ ->
   map = L.map('map').setView([28.3, 20.8], 3)
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
-    attribution: '<a href="https://github.com/JanBe/woo-map">GitHub Project</a> | Map data © <a href="http://openstreetmap.org">OpenStreetMap</a>, © <a href="http://mapbox.com">Mapbox</a>',
+    attribution: '<a href="https://github.com/JanBe/woo-map">WOO Map @ GitHub</a> | Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> © <a href="http://mapbox.com">Mapbox</a>',
     maxZoom: 18,
     id: 'mapbox.streets-satellite',
     accessToken: $('#map').data().mapboxAccessToken
