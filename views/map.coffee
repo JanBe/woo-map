@@ -67,7 +67,6 @@
         <img src='#{session_picture.url}'></img>
       </div>"
     else '') + "
-    <p>
     <div class=session-details--stats>
       <div class='session-details--stat'>
         <div class='session-details--stat-figure'>
@@ -133,7 +132,7 @@
 $ ->
   map = L.map('map').setView([28.3, 20.8], 3)
   L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
-    attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://mapbox.com">Mapbox</a>',
+    attribution: '<a href="https://github.com/JanBe/woo-map">GitHub Project</a> | Map data © <a href="http://openstreetmap.org">OpenStreetMap</a>, © <a href="http://mapbox.com">Mapbox</a>',
     maxZoom: 18,
     id: 'mapbox.streets-satellite',
     accessToken: $('#map').data().mapboxAccessToken
