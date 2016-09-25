@@ -9,6 +9,10 @@ The aim of this is to put the map on an unused screen and see where people are k
 ## Demo
 A Heroku hosted instance of the map can be found here: [woo-map.herokuapp.com](https://woo-map.herokuapp.com/)
 
+### Screenshots
+![WOO Map overview](https://github.com/JanBe/woo-map/blob/master/doc/screenshots/overview.jpg)
+![WOO Map session details](https://github.com/JanBe/woo-map/blob/master/doc/screenshots/session-details.jpg)
+
 ## Further Development
 These are the ideas I currently have for extending the functionality of the map. If you have suggestions, feel free to contact me or add them as [issues](https://github.com/JanBe/woo-map/issues).
 
