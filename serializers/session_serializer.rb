@@ -1,20 +1,14 @@
 class SessionSerializer < ActiveModel::Serializer
   FORMAT_DURATION_ATTRIBUTES = [:max_airtime, :total_airtime, :duration]
-  FORMAT_DATETIME_ATTRIBUTES = [:posted_at, :finished_at]
   attributes(*FORMAT_DURATION_ATTRIBUTES)
-  attributes(*FORMAT_DATETIME_ATTRIBUTES)
 
-  attributes :woo_id, :highest_jump, :total_height, :number_of_jumps, :description, :max_crash_power, :likes, :comments, :user_name, :finished_at_timestamp
+  attributes :woo_id, :highest_jump, :total_height, :number_of_jumps, :description, :max_crash_power, :likes, :comments, :user_name, :finished_at
 
   has_many :pictures
   has_one :spot, foreign_key: 'spot_woo_id', primary_key: 'woo_id'
 
   FORMAT_DURATION_ATTRIBUTES.each do |attr|
     define_method(attr) { format_duration(object.send(attr)) }
-  end
-
-  FORMAT_DATETIME_ATTRIBUTES.each do |attr|
-    define_method(attr) { format_datetime(object.send(attr)) }
   end
 
   private
@@ -32,9 +26,5 @@ class SessionSerializer < ActiveModel::Serializer
     else
       time.strftime('%-kh %-Mm %-Ss')
     end
-  end
-
-  def format_datetime(datetime)
-    datetime.strftime('%a %b %d, %k:%M')
   end
 end

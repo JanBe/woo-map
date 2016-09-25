@@ -5,7 +5,7 @@
       marker = L.marker(
         [session.spot.location.lat, session.spot.location.lng],
         title: "#{session.user_name} @ #{session.spot.name} (#{session.finished_at})",
-        session_finished_at: new Date(session.finished_at_timestamp),
+        session_finished_at: new Date(session.finished_at),
         icon: L.icon
           iconUrl: 'images/woopin.png',
           iconSize: [25, 38],
@@ -60,7 +60,7 @@
         <div>#{session.description}</div>
         <span class='session-details--spot'>at #{session.spot.name}</span>
       </div>
-      <span class='session-details--finished-at'>#{session.finished_at}</span>
+      <span class='session-details--finished-at'>#{formatDate(new Date(session.finished_at))}</span>
     </div>" +
     (if session_picture? then "
       <div class='session-details--picture'>
@@ -128,6 +128,11 @@
       </div>
     </div>
   </div>"
+
+@formatDate = (date) ->
+  weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+  "#{weekdays[date.getDay()]} #{months[date.getMonth()]} #{date.getDate()}, #{date.getHours()}:#{date.getMinutes()}"
 
 $ ->
   map = L.map('map').fitWorld()
