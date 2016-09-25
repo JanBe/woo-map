@@ -16,7 +16,7 @@ A Heroku hosted instance of the map can be found here: [woo-map.herokuapp.com](h
 ## Further Development
 These are the ideas I currently have for extending the functionality of the map. If you have suggestions, feel free to contact me or add them as [issues](https://github.com/JanBe/woo-map/issues).
 
-* Use an endpoint of the WOO-API that returns all recent sessions instead of the "community"-view. Currently only sessions > 5m height are displayed.
+* Use an endpoint of the WOO-API that returns all recent sessions instead of the "community"-view. Currently only sessions over 5m height are displayed.
 * When an endpoint is used that returns all sessions, use a [day-night cycle overlay](http://joergdietrich.github.io/Leaflet.Terminator/) to see how the sessions move with the daylight. Currently the amount of sessions is not high enough for that.
 * Add a [Windity](https://www.windyty.com) overlay to display the current wind around the world. Ideally, adjust the current time of the overlay to a session when its details-window is opened.
 * Use a background job to load new sessions instead of checking for the necessity of an update on every call to `/sessions`.
