@@ -130,9 +130,7 @@
   </div>"
 
 @formatDate = (date) ->
-  weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  "#{weekdays[date.getDay()]} #{months[date.getMonth()]} #{date.getDate()}, #{date.getHours()}:#{date.getMinutes()}"
+  "#{date.toDateString()[0..-6]}, #{date.toTimeString()[0..4]}"
 
 $ ->
   map = L.map('map').fitWorld()
