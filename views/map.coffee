@@ -1,3 +1,11 @@
+@windytyInit = {
+  key: document.currentScript.dataset.windytyAccessToken
+}
+
+@windytyMain = (map) ->
+  map.fitWorld()
+  loadSessions(map)
+
 @loadSessions = (map, markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
   # When requesting sessions, convert the timestamp from milliseconds to seconds
   $.get '/sessions', ({last_updated_at: (lastUpdatedAt / 1000).toFixed()} if lastUpdatedAt?), (sessions) ->
@@ -131,14 +139,3 @@
 
 @formatDate = (date) ->
   "#{date.toDateString()[0..-6]}, #{date.toTimeString()[0..4]}"
-
-$ ->
-  map = L.map('map').fitWorld()
-  L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}@2x.png?access_token={accessToken}', {
-    attribution: '<a href="https://github.com/JanBe/woo-map">WOO Map @ GitHub</a> | Map data © <a href="http://openstreetmap.org">OpenStreetMap</a> © <a href="http://mapbox.com">Mapbox</a>',
-    maxZoom: 18,
-    id: 'mapbox.streets-satellite',
-    accessToken: $('#map').data().mapboxAccessToken
-  }).addTo(map)
-
-  loadSessions(map)
