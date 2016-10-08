@@ -1,8 +1,4 @@
-@windytyInit = {
-  key: document.currentScript.dataset.windytyAccessToken
-}
-
-@windytyMain = (map) ->
+@initMap = (map) ->
   map.fitWorld()
   loadSessions(map)
 
