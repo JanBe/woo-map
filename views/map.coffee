@@ -1,6 +1,14 @@
 @initMap = (map) ->
   map.fitWorld()
+  map.on 'popupopen', (e) -> setWindDate(e.popup._source.options.session_finished_at)
+  map.on 'popupclose', (e) -> setWindDate(new Date)
+
   loadSessions(map)
+  setWindDate(new Date)
+
+@setWindDate = (date) ->
+  W.setTimestamp(date)
+  $('#wind-date').text(formatDate(date))
 
 @loadSessions = (map, markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
   # When requesting sessions, convert the timestamp from milliseconds to seconds

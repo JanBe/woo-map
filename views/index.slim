@@ -22,4 +22,8 @@ html
     script#windytv-script src='/javascripts/windytv-2.0/boot.js' async='async' defer='defer' data-windytv-api-key="#{ENV['WINDYTV_API_KEY']}"
 
   body
+    #wind-date-wrapper
+      |Displaying wind data for
+      b
+        #wind-date
     #map
