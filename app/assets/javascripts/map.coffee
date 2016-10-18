@@ -1,0 +1,142 @@
+@initMap = (map) ->
+  map.fitWorld()
+  map.on 'popupopen', (e) -> setWindDate(e.popup._source.options.session_finished_at)
+  map.on 'popupclose', (e) -> setWindDate(new Date)
+
+  loadSessions(map)
+  setWindDate(new Date)
+
+@setWindDate = (date) ->
+  W.setTimestamp(date)
+  $('#wind-date').text(formatDate(date))
+
+@loadSessions = (map, markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
+  # When requesting sessions, convert the timestamp from milliseconds to seconds
+  $.get '/sessions', ({last_updated_at: (lastUpdatedAt / 1000).toFixed()} if lastUpdatedAt?), (sessions) ->
+    for session in sessions
+      marker = L.marker(
+        [session.spot.location.lat, session.spot.location.lng],
+        title: "#{session.user_name} @ #{session.spot.name} (#{session.finished_at})",
+        session_finished_at: new Date(session.finished_at),
+        icon: L.icon
+          iconUrl: 'assets/woopin.png',
+          iconSize: [25, 38],
+          iconAnchor: [12.5, 38],
+          popupAnchor: [1, -38]
+      )
+      marker.bindPopup(
+        sessionDetails(session),
+        maxWidth: 400
+      )
+      markers.push(marker)
+
+    expiredMarkers = filterExpiredMarkers(markers)
+    markers = (marker for marker in markers when marker not in expiredMarkers)
+
+    markerClusterGroup.addLayers(markers)
+    markerClusterGroup.removeLayers(expiredMarkers)
+    map.addLayer(markerClusterGroup)
+
+    lastUpdatedAt = $.now()
+    setTimeout((-> loadSessions(map, markers, markerClusterGroup, lastUpdatedAt)), 30000)
+
+# Markers of sessions that were posted more than 24 hours ago
+@filterExpiredMarkers = (markers) ->
+  markers.filter (marker) ->
+      marker.options.session_finished_at < new Date($.now() - 1000 * 60 * 60 * 24)
+
+@clusterIcon = (cluster) ->
+  L.divIcon(
+    className: 'marker-cluster',
+    iconSize: L.point(32, 32),
+    html: "
+      <div class='marker-cluster--inner'>
+        <span class='marker-cluster--count'>
+          #{cluster.getChildCount()}
+        </span
+      </div>"
+  )
+
+@sessionDetails = (session) ->
+  "<div class='session-details'>" +
+    (if session.user.profile_picture_url? then "
+    <div class='session-details--profile-picture'>
+      <img src='#{session.user.profile_picture_url}'></img
+    <div>" else '') + "
+    <h1>#{session.user.first_name} #{session.user.last_name}</h1>
+    <div class='session-details--meta'>
+      <div class='session-details--description'>
+        <div>#{session.description}</div>
+        <span class='session-details--spot'>at #{session.spot.name}</span>
+      </div>
+      <span class='session-details--finished-at'>#{formatDate(new Date(session.finished_at))}</span>
+    </div>" +
+    (if session.picture_url? then "
+      <div class='session-details--picture'>
+        <img src='#{session.picture_url}'></img>
+      </div>"
+    else '') + "
+    <div class=session-details--stats>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.highest_jump.toFixed(1)}m</b>
+        </div>
+        Highest Jump
+      </div>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.max_airtime}</b>
+        </div>
+        Max Airtime
+      </div>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.max_crash_power.toFixed(1)}G</b>
+        </div>
+        Landing
+      </div>
+    </div>
+    <div class=session-details--stats>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.total_height.toFixed(1)}m</b>
+        </div>
+        Total Height
+      </div>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.total_airtime}</b>
+        </div>
+        Total Airtime
+      </div>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.duration}</b>
+        </div>
+        Session Duration
+      </div>
+    </div>
+    <div class=session-details--stats>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.likes}</b>
+        </div>
+        Likes
+      </div>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.comments}</b>
+        </div>
+        Comments
+      </div>
+      <div class='session-details--stat'>
+        <div class='session-details--stat-figure'>
+          <b>#{session.number_of_jumps}</b>
+        </div>
+        Jumps
+      </div>
+    </div>
+  </div>"
+
+@formatDate = (date) ->
+  "#{date.toDateString()[0..-6]}, #{date.toTimeString()[0..4]}"

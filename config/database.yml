@@ -1,9 +1,10 @@
-development:
+<% raise("Please create \".env.#{Rails.env}\" from the provided sample file!") unless ENV['DB_ENV_POSTGRESQL_DB'] || ENV['DB_NAME'] %>
+<%= Rails.env %>:
   adapter: postgresql
-  database: woo-map-development
-  username: <%= ENV['PG_USER'] %>
-  password: <%= ENV['PG_PASS'] %>
-  host: localhost
-
-production:
-  url: <%= ENV['DATABASE_URL'] %>
+  encoding: unicode
+  host: <%= ENV['DB_PORT_5432_TCP_ADDR'] || ENV['DB_HOST'] %>
+  database: <%= ENV['DB_ENV_POSTGRESQL_DB'] || ENV['DB_NAME'] %>
+  port: <%= ENV['DB_PORT_5432_TCP_PORT'] || ENV['DB_PORT'] %>
+  pool: 5
+  username: <%= ENV['DB_ENV_POSTGRESQL_USER'] || ENV['DB_USER'] %>
+  password: <%= ENV['DB_ENV_POSTGRESQL_PASS'] || ENV['DB_PASSWORD'] %>

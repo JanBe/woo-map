@@ -10,18 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160917210250) do
+ActiveRecord::Schema.define(version: 20161017202623) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
-
-  create_table "pictures", force: :cascade do |t|
-    t.string   "picture_type"
-    t.string   "url"
-    t.integer  "session_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
 
   create_table "sessions", force: :cascade do |t|
     t.string   "woo_id"
@@ -33,25 +25,45 @@ ActiveRecord::Schema.define(version: 20160917210250) do
     t.integer  "number_of_jumps"
     t.string   "description"
     t.float    "max_crash_power"
-    t.string   "user_name"
     t.integer  "spot_id"
     t.integer  "likes"
     t.integer  "comments"
     t.datetime "posted_at"
     t.datetime "finished_at"
     t.string   "title"
+    t.string   "user_woo_id"
     t.string   "spot_woo_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.string   "picture_url"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
   end
 
   create_table "spots", force: :cascade do |t|
     t.string   "woo_id"
     t.string   "name"
-    t.decimal  "location_lat", precision: 10, scale: 6
-    t.decimal  "location_lng", precision: 10, scale: 6
-    t.datetime "created_at"
-    t.datetime "updated_at"
+    t.decimal  "location_lat"
+    t.decimal  "location_lng"
+    t.datetime "created_at",   null: false
+    t.datetime "updated_at",   null: false
+  end
+
+  create_table "users", force: :cascade do |t|
+    t.string   "woo_id"
+    t.string   "first_name"
+    t.string   "last_name"
+    t.string   "profile_picture_url"
+    t.string   "cover_picture_url"
+    t.datetime "created_at",          null: false
+    t.datetime "updated_at",          null: false
+  end
+
+  create_table "woo_app_api_tokens", force: :cascade do |t|
+    t.string   "access_token"
+    t.datetime "expires_at"
+    t.string   "scope"
+    t.string   "refresh_token"
+    t.datetime "created_at",    null: false
+    t.datetime "updated_at",    null: false
   end
 
 end
