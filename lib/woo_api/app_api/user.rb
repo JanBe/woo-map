@@ -1,10 +1,10 @@
 module WooApi
   module AppApi
     class User < Base
-      RESOURCE_PATH = 'user/'
+      RESOURCE_PATH = '/user'
 
       def self.login
-        request = build_request("#{RESOURCE_PATH}login", {
+        request = build_request("#{RESOURCE_PATH}/login", {
           email: ENV['WOO_APP_API_EMAIL'],
           pass: Digest::SHA512.new.update(ENV['WOO_APP_API_PASSWORD'])
         })
