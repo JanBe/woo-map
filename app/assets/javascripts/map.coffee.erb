@@ -19,7 +19,7 @@
         title: "#{session.user_name} @ #{session.spot.name} (#{session.finished_at})",
         session_finished_at: new Date(session.finished_at),
         icon: L.icon
-          iconUrl: 'assets/woopin.png',
+          iconUrl: "<%= asset_path('woopin.png') %>",
           iconSize: [25, 38],
           iconAnchor: [12.5, 38],
           popupAnchor: [1, -38]
