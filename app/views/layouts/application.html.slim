@@ -5,7 +5,7 @@ html
     = stylesheet_link_tag 'application', media: 'all'
     = javascript_include_tag 'application'
 
-    script#windytv-script src='/assets/windytv-2.0/boot.js' async='async' defer='defer' data-windytv-api-key="#{ENV['WINDYTV_API_KEY']}"
+    script#windytv-script src="#{asset_path('windytv-2.0/boot.js')}" async='async' defer='defer' data-windytv-api-key="#{ENV['WINDYTV_API_KEY']}"
 
     link rel='shortcut icon' type='image/x-icon' href='/favicon.ico'
     link rel='apple-touch-icon' href='/images/touch-icons/apple-touch-icon.png'
