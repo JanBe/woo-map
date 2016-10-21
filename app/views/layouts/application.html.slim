@@ -1,0 +1,20 @@
+html
+  head
+    title WOO Map
+    = csrf_meta_tags
+    = stylesheet_link_tag 'application', media: 'all'
+    = javascript_include_tag 'application'
+
+    script#windytv-script src="#{asset_path('windytv-2.0/boot.js')}" async='async' defer='defer' data-windytv-api-key="#{ENV['WINDYTV_API_KEY']}"
+
+    link rel='shortcut icon' type='image/x-icon' href='/favicon.ico'
+    link rel='apple-touch-icon' href='/images/touch-icons/apple-touch-icon.png'
+    link rel='apple-touch-icon' sizes='76x76' href='/images/touch-icons/apple-touch-icon-76x76.png'
+    link rel='apple-touch-icon' sizes='120x120' href='/images/touch-icons/apple-touch-icon-120x120.png'
+    link rel='apple-touch-icon' sizes='152x152' href='/images/touch-icons/apple-touch-icon-152x152.png'
+    link rel='apple-touch-icon' sizes='180x180' href='/images/touch-icons/apple-touch-icon-180x180.png'
+    link rel='icon' sizes='192x192' href='/images/touch-icons/touch-icon-192x192.png'
+    meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+
+  body
+    = yield
