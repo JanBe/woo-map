@@ -5,8 +5,9 @@
   map.on 'popupopen', (e) -> setWindDate(e.popup._source.options.session_finished_at)
   map.on 'popupclose', (e) -> setWindDate(new Date)
 
-  addMarkerLayer(map)
-  addHeatLayer(map)
+  # Per default the marker layer is switched on, while the heat layer is switched off
+  addMarkerLayer(map) unless getParams().markers == 'false'
+  addHeatLayer(map) if getParams().heat == 'true'
   setWindDate(new Date)
 
 @setWindDate = (date) ->
@@ -164,3 +165,14 @@
 
 @formatDate = (date) ->
   "#{date.toDateString()[0..-6]}, #{date.toTimeString()[0..4]}"
+
+@getParams = ->
+  query = window.location.search.substring(1)
+  raw_vars = query.split("&")
+  params = {}
+
+  for v in raw_vars
+    [key, val] = v.split("=")
+    params[key] = decodeURIComponent(val)
+
+  params
