@@ -1,34 +1,40 @@
+@dataFetchDelay = 30000
+
 @initMap = (map) ->
   map.fitWorld()
   map.on 'popupopen', (e) -> setWindDate(e.popup._source.options.session_finished_at)
   map.on 'popupclose', (e) -> setWindDate(new Date)
 
-  loadSessions(map)
+  addMarkerLayer(map)
+  addHeatLayer(map)
   setWindDate(new Date)
 
 @setWindDate = (date) ->
   W.setTimestamp(date)
   $('#wind-date').text(formatDate(date))
 
-@loadSessions = (map, markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
+@addHeatLayer = (map, heatLayer=null) ->
+  $.get '/sessions', (sessions) ->
+    heats = []
+    for session in sessions
+      heats.push sessionToHeat(session)
+
+    if heatLayer?
+      heatLayer.setLatLngs(heats)
+    else
+      heatLayer = L.heatLayer(heats, {radius: 20})
+      heatLayer.addTo(map)
+
+    setTimeout((-> addHeatLayer(map, heatLayer)), dataFetchDelay)
+
+@sessionToHeat = (session) ->
+  [session.spot.location.lat, session.spot.location.lng, session.number_of_jumps]
+
+@addMarkerLayer = (map, markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
   # When requesting sessions, convert the timestamp from milliseconds to seconds
   $.get '/sessions', ({last_updated_at: (lastUpdatedAt / 1000).toFixed()} if lastUpdatedAt?), (sessions) ->
     for session in sessions
-      marker = L.marker(
-        [session.spot.location.lat, session.spot.location.lng],
-        title: "#{session.user_name} @ #{session.spot.name} (#{session.finished_at})",
-        session_finished_at: new Date(session.finished_at),
-        icon: L.icon
-          iconUrl: "<%= asset_path('woopin.png') %>",
-          iconSize: [25, 38],
-          iconAnchor: [12.5, 38],
-          popupAnchor: [1, -38]
-      )
-      marker.bindPopup(
-        sessionDetails(session),
-        maxWidth: 400
-      )
-      markers.push(marker)
+      markers.push(initializeMarkerForSession(session))
 
     expiredMarkers = filterExpiredMarkers(markers)
     markers = (marker for marker in markers when marker not in expiredMarkers)
@@ -38,7 +44,25 @@
     map.addLayer(markerClusterGroup)
 
     lastUpdatedAt = $.now()
-    setTimeout((-> loadSessions(map, markers, markerClusterGroup, lastUpdatedAt)), 30000)
+    setTimeout((-> addMarkerLayer(map, markers, markerClusterGroup, lastUpdatedAt)), dataFetchDelay)
+
+@initializeMarkerForSession = (session) ->
+  marker = L.marker(
+    [session.spot.location.lat, session.spot.location.lng],
+    title: "#{session.user_name} @ #{session.spot.name} (#{session.finished_at})",
+    session_finished_at: new Date(session.finished_at),
+    icon: L.icon
+      iconUrl: "<%= asset_path('woopin.png') %>",
+      iconSize: [25, 38],
+      iconAnchor: [12.5, 38],
+      popupAnchor: [1, -38]
+  )
+  marker.bindPopup(
+    sessionDetails(session),
+    maxWidth: 400
+  )
+  marker
+
 
 # Markers of sessions that were posted more than 24 hours ago
 @filterExpiredMarkers = (markers) ->
