@@ -1,4 +1,12 @@
 #header
+  #overlay-options
+    = form_tag do
+      = label :overlay, :marker, class: "overlay-option #{'selected' if @overlay.marker?}" do
+        |Marker
+        = radio_button_tag :overlay, 'marker', @overlay.marker?
+      = label :overlay, :heat, class: "overlay-option #{'selected' if @overlay.heat?}" do
+        |Heat
+        = radio_button_tag :overlay, 'heat', @overlay.heat?
     = image_tag 'woo-logo.png', id: 'woo-logo', size: '80x40'
   #wind-date-wrapper
     |Showing wind data for

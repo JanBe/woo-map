@@ -6,6 +6,20 @@ html, body
   font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif
 
 #header
+  #overlay-options
+    height: 100%
+    .overlay-option
+      display: inline-block
+      height: 100%
+      width: 65px
+      color: black
+      text-align: center
+      line-height: 55px
+      &.selected
+        color: white
+        background-color: $woo-cyan
+      input
+        display: none
   height: 55px
   float: left
   width: 100%
