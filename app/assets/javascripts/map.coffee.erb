@@ -6,6 +6,7 @@
 @initMap = (map) ->
   @map = map
   map.setView(new L.LatLng(25, 0), 2)
+  map.locate(setView: true, maxZoom: 5)
   setWindDate(new Date)
   addSelectedOverlayToMap()
 
