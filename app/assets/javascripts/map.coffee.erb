@@ -1,17 +1,18 @@
-@dataFetchDelay = 30000
+@dataPollDelay = 30000
 @activeLayer = null
 @map = null
+@dataPollPromise = null
 
 @initMap = (map) ->
   @map = map
   map.fitWorld()
   setWindDate(new Date)
-  addSelectedOverLayerToMap()
+  addSelectedOverlayToMap()
 
   $('#overlay-options input[name="overlay"]').change =>
     $('#overlay-options .overlay-option').toggleClass('selected')
     removeActiveLayerFromMap()
-    addSelectedOverLayerToMap()
+    addSelectedOverlayToMap()
 
 @setWindDate = (date) ->
   W.setTimestamp(date)
@@ -29,7 +30,7 @@
       heatLayer = L.heatLayer(heats, {radius: 20})
       addLayerToMap(heatLayer)
 
-    setTimeout((-> addHeatLayer(heatLayer)), dataFetchDelay)
+    setTimeout((-> addHeatLayer(heatLayer)), dataPollDelay)
 
 @sessionToHeat = (session) ->
   [session.spot.location.lat, session.spot.location.lng, session.number_of_jumps]
@@ -51,7 +52,7 @@
     addLayerToMap(markerClusterGroup)
 
     lastUpdatedAt = $.now()
-    setTimeout((-> addMarkerLayer(markers, markerClusterGroup, lastUpdatedAt)), dataFetchDelay)
+    setTimeout((-> addMarkerLayer(markers, markerClusterGroup, lastUpdatedAt)), dataPollDelay)
 
 @initializeMarkerForSession = (session) ->
   marker = L.marker(
@@ -178,7 +179,7 @@
   @map.addLayer(layer)
   @activeLayer = layer
 
-@addSelectedOverLayerToMap = ->
+@addSelectedOverlayToMap = ->
   switch @selectedOverlay()
     when 'marker' then addMarkerLayer()
     when 'heat' then addHeatLayer()
