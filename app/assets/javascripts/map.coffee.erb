@@ -20,24 +20,24 @@
   W.setTimestamp(date)
   $('#wind-date').text(formatDate(date))
 
-@addHeatLayer = (heatLayer=null) ->
+@addJumpsLayer = (jumpsLayer=null) ->
   $.get '/sessions', (sessions) =>
-    heats = []
+    jumps = []
     for session in sessions
-      heats.push sessionToHeat(session)
+      jumps.push sessionToHeat(session)
 
-    if heatLayer?
-      heatLayer.setLatLngs(heats)
+    if jumpsLayer?
+      jumpsLayer.setLatLngs(jumps)
     else
-      heatLayer = L.heatLayer(heats, {radius: 20})
-      addLayerToMap(heatLayer)
+      jumpsLayer = L.heatLayer(jumps, {radius: 20})
+      addLayerToMap(jumpsLayer)
 
-    @dataPollPromise = setTimeout((-> addHeatLayer(heatLayer)), dataPollDelay)
+    @dataPollPromise = setTimeout((-> addJumpsLayer(jumpsLayer)), dataPollDelay)
 
 @sessionToHeat = (session) ->
   [session.spot.location.lat, session.spot.location.lng, session.number_of_jumps]
 
-@addMarkerLayer = (markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
+@addSessionsLayer = (markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
   @map.on 'popupopen', (e) -> setWindDate(e.popup._source.options.session_finished_at)
   @map.on 'popupclose', (e) -> setWindDate(new Date)
 
@@ -54,7 +54,7 @@
     addLayerToMap(markerClusterGroup)
 
     lastUpdatedAt = $.now()
-    @dataPollPromise = setTimeout((-> addMarkerLayer(markers, markerClusterGroup, lastUpdatedAt)), dataPollDelay)
+    @dataPollPromise = setTimeout((-> addSessionsLayer(markers, markerClusterGroup, lastUpdatedAt)), dataPollDelay)
 
 @initializeMarkerForSession = (session) ->
   marker = L.marker(
@@ -183,8 +183,8 @@
 
 @addSelectedOverlayToMap = ->
   switch @selectedOverlay()
-    when 'marker' then addMarkerLayer()
-    when 'heat' then addHeatLayer()
+    when 'sessions' then addSessionsLayer()
+    when 'jumps' then addJumpsLayer()
 
 @removeActiveLayerFromMap = ->
   @map.removeLayer(@activeLayer) if @activeLayer?

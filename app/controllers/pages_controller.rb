@@ -1,5 +1,5 @@
 class PagesController < ApplicationController
   def map
-    @overlay = (params[:overlay] || 'marker').inquiry
+    @overlay = (params[:overlay] || 'sessions').inquiry
   end
 end
