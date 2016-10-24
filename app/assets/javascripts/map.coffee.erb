@@ -5,7 +5,7 @@
 
 @initMap = (map) ->
   @map = map
-  map.fitWorld()
+  map.setView(new L.LatLng(25, 0), 2)
   setWindDate(new Date)
   addSelectedOverlayToMap()
 
