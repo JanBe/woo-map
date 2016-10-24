@@ -11,6 +11,7 @@
 
   $('#overlay-options input[name="overlay"]').change =>
     $('#overlay-options .overlay-option').toggleClass('selected')
+    clearTimeout(@dataPollPromise)
     removeActiveLayerFromMap()
     addSelectedOverlayToMap()
 
@@ -19,7 +20,7 @@
   $('#wind-date').text(formatDate(date))
 
 @addHeatLayer = (heatLayer=null) ->
-  $.get '/sessions', (sessions) ->
+  $.get '/sessions', (sessions) =>
     heats = []
     for session in sessions
       heats.push sessionToHeat(session)
@@ -30,7 +31,7 @@
       heatLayer = L.heatLayer(heats, {radius: 20})
       addLayerToMap(heatLayer)
 
-    setTimeout((-> addHeatLayer(heatLayer)), dataPollDelay)
+    @dataPollPromise = setTimeout((-> addHeatLayer(heatLayer)), dataPollDelay)
 
 @sessionToHeat = (session) ->
   [session.spot.location.lat, session.spot.location.lng, session.number_of_jumps]
@@ -40,7 +41,7 @@
   @map.on 'popupclose', (e) -> setWindDate(new Date)
 
   # When requesting sessions, convert the timestamp from milliseconds to seconds
-  $.get '/sessions', ({last_updated_at: (lastUpdatedAt / 1000).toFixed()} if lastUpdatedAt?), (sessions) ->
+  $.get '/sessions', ({last_updated_at: (lastUpdatedAt / 1000).toFixed()} if lastUpdatedAt?), (sessions) =>
     for session in sessions
       markers.push(initializeMarkerForSession(session))
 
@@ -52,7 +53,7 @@
     addLayerToMap(markerClusterGroup)
 
     lastUpdatedAt = $.now()
-    setTimeout((-> addMarkerLayer(markers, markerClusterGroup, lastUpdatedAt)), dataPollDelay)
+    @dataPollPromise = setTimeout((-> addMarkerLayer(markers, markerClusterGroup, lastUpdatedAt)), dataPollDelay)
 
 @initializeMarkerForSession = (session) ->
   marker = L.marker(
