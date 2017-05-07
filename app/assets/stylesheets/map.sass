@@ -3,22 +3,40 @@ html, body
   height: 100%
   margin: 0
   padding: 0
-
-#wind-date-wrapper
-  z-index: 999
-  position: absolute
-  top: 5px
-  left: 50%
-  margin-left: -75px
   font: 12px/1.5 "Helvetica Neue", Arial, Helvetica, sans-serif
-  text-align: center
-  background: white
-  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4)
-  border-radius: 8px
-  padding: 5px 10px 5px 10px
+
+#header
+  #overlay-options
+    height: 100%
+    .overlay-option
+      display: inline-block
+      height: 100%
+      width: 65px
+      color: black
+      text-align: center
+      line-height: 55px
+      &.selected
+        color: white
+        background-color: $woo-cyan
+      input
+        display: none
+  height: 55px
+  float: left
+  width: 100%
+  #woo-logo
+    position: absolute
+    left: 50%
+    top: 0px
+    margin-top: 7px
+    margin-left: -40px
+  #wind-date-wrapper
+    position: absolute
+    top: 10px
+    right: 10px
 
 #map
-  height: 100%
+  position: relative
+  height: calc(100% - 55px)
   width: 100%
 
 .session-details
@@ -54,11 +72,14 @@ html, body
   bottom: 0
 
 .session-details--picture
-  margin-bottom: 10px
+  margin-bottom: 5px
 
-.session-details--picture > img
-  width: 100%
-  min-height: 225px
+#map
+  .session-details--picture > img
+    height: 200px
+    max-width: 100% !important
+    display: block
+    margin: auto
 
 .session-details--stats
   margin-bottom: 10px

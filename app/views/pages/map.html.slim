@@ -1,5 +1,16 @@
-#wind-date-wrapper
-  |Displaying wind data for
-  b
-    #wind-date
+#header
+  #overlay-options
+    = form_tag do
+      = label :overlay, :sessions, class: "overlay-option #{'selected' if @overlay.sessions?}" do
+        |Sessions
+        = radio_button_tag :overlay, 'sessions', @overlay.sessions?
+      = label :overlay, :jumps, class: "overlay-option #{'selected' if @overlay.jumps?}" do
+        |Jumps
+        = radio_button_tag :overlay, 'jumps', @overlay.jumps?
+    = image_tag 'woo-logo.png', id: 'woo-logo', size: '80x40'
+  #wind-date-wrapper
+    |Showing wind data for
+    b
+      #wind-date
 #map
+#footer

@@ -1,44 +1,79 @@
-@initMap = (map) ->
-  map.fitWorld()
-  map.on 'popupopen', (e) -> setWindDate(e.popup._source.options.session_finished_at)
-  map.on 'popupclose', (e) -> setWindDate(new Date)
+@dataPollDelay = 30000
+@activeLayer = null
+@map = null
+@dataPollPromise = null
 
-  loadSessions(map)
+@initMap = (map) ->
+  @map = map
+  map.setView(new L.LatLng(25, 0), 2)
+  map.locate(setView: true, maxZoom: 5)
   setWindDate(new Date)
+  addSelectedOverlayToMap()
+  fixHeightOfPopupWrapper()
+
+  $('#overlay-options input[name="overlay"]').change =>
+    $('#overlay-options .overlay-option').toggleClass('selected')
+    clearTimeout(@dataPollPromise)
+    removeActiveLayerFromMap()
+    addSelectedOverlayToMap()
 
 @setWindDate = (date) ->
   W.setTimestamp(date)
   $('#wind-date').text(formatDate(date))
 
-@loadSessions = (map, markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
-  # When requesting sessions, convert the timestamp from milliseconds to seconds
-  $.get '/sessions', ({last_updated_at: (lastUpdatedAt / 1000).toFixed()} if lastUpdatedAt?), (sessions) ->
+@addJumpsLayer = (jumpsLayer=null) ->
+  $.get '/sessions', (sessions) =>
+    jumps = []
     for session in sessions
-      marker = L.marker(
-        [session.spot.location.lat, session.spot.location.lng],
-        title: "#{session.user_name} @ #{session.spot.name} (#{session.finished_at})",
-        session_finished_at: new Date(session.finished_at),
-        icon: L.icon
-          iconUrl: "<%= asset_path('woopin.png') %>",
-          iconSize: [25, 38],
-          iconAnchor: [12.5, 38],
-          popupAnchor: [1, -38]
-      )
-      marker.bindPopup(
-        sessionDetails(session),
-        maxWidth: 400
-      )
-      markers.push(marker)
+      jumps.push sessionToHeat(session)
+
+    if jumpsLayer?
+      jumpsLayer.setLatLngs(jumps)
+    else
+      jumpsLayer = L.heatLayer(jumps, {radius: 20})
+      addLayerToMap(jumpsLayer)
+
+    @dataPollPromise = setTimeout((-> addJumpsLayer(jumpsLayer)), dataPollDelay)
+
+@sessionToHeat = (session) ->
+  [session.spot.location.lat, session.spot.location.lng, session.number_of_jumps]
+
+@addSessionsLayer = (markers=[], markerClusterGroup=L.markerClusterGroup(iconCreateFunction: clusterIcon), lastUpdatedAt=null) ->
+  @map.on 'popupopen', (e) -> setWindDate(e.popup._source.options.session_finished_at)
+  @map.on 'popupclose', (e) -> setWindDate(new Date)
+
+  # When requesting sessions, convert the timestamp from milliseconds to seconds
+  $.get '/sessions', ({last_updated_at: (lastUpdatedAt / 1000).toFixed()} if lastUpdatedAt?), (sessions) =>
+    for session in sessions
+      markers.push(initializeMarkerForSession(session))
 
     expiredMarkers = filterExpiredMarkers(markers)
     markers = (marker for marker in markers when marker not in expiredMarkers)
 
     markerClusterGroup.addLayers(markers)
     markerClusterGroup.removeLayers(expiredMarkers)
-    map.addLayer(markerClusterGroup)
+    addLayerToMap(markerClusterGroup)
 
     lastUpdatedAt = $.now()
-    setTimeout((-> loadSessions(map, markers, markerClusterGroup, lastUpdatedAt)), 30000)
+    @dataPollPromise = setTimeout((-> addSessionsLayer(markers, markerClusterGroup, lastUpdatedAt)), dataPollDelay)
+
+@initializeMarkerForSession = (session) ->
+  marker = L.marker(
+    [session.spot.location.lat, session.spot.location.lng],
+    title: "#{session.user_name} @ #{session.spot.name} (#{session.finished_at})",
+    session_finished_at: new Date(session.finished_at),
+    icon: L.icon
+      iconUrl: "<%= asset_path('woo-pin.png') %>",
+      iconSize: [25, 38],
+      iconAnchor: [12.5, 38],
+      popupAnchor: [1, -38]
+  )
+  marker.bindPopup(
+    sessionDetails(session),
+    maxWidth: 400
+  )
+  marker
+
 
 # Markers of sessions that were posted more than 24 hours ago
 @filterExpiredMarkers = (markers) ->
@@ -140,3 +175,30 @@
 
 @formatDate = (date) ->
   "#{date.toDateString()[0..-6]}, #{date.toTimeString()[0..4]}"
+
+@selectedOverlay = -> $('input:radio[name="overlay"]:checked').val()
+
+@addLayerToMap = (layer) ->
+  @map.addLayer(layer)
+  @activeLayer = layer
+
+@addSelectedOverlayToMap = ->
+  switch @selectedOverlay()
+    when 'sessions' then addSessionsLayer()
+    when 'jumps' then addJumpsLayer()
+
+@removeActiveLayerFromMap = ->
+  @map.removeLayer(@activeLayer) if @activeLayer?
+
+# This is an ugly fix for accidentially closing of popups
+# When clicking a marker that is visible in the slot between the currently
+# open popup and its' marker, the corresponding popup will not open. This
+# happens due to the wrapper of the popup, which also includes the tip of
+# the popup in its height. At this functionality is part of how mapbox
+# handles popups, I am not currently aware of a more elegant way to fix this.
+@fixHeightOfPopupWrapper = ->
+  @map.on 'popupopen', (event) ->
+    popup = $('.leaflet-popup')
+    popupHeight = $(popup.children()[1]).height()
+    popup.height(popupHeight)
+    popup.css('margin-bottom', 20)
