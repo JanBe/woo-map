@@ -9,6 +9,7 @@
   map.locate(setView: true, maxZoom: 5)
   setWindDate(new Date)
   addSelectedOverlayToMap()
+  fixHeightOfPopupWrapper()
 
   $('#overlay-options input[name="overlay"]').change =>
     $('#overlay-options .overlay-option').toggleClass('selected')
@@ -188,3 +189,16 @@
 
 @removeActiveLayerFromMap = ->
   @map.removeLayer(@activeLayer) if @activeLayer?
+
+# This is an ugly fix for accidentially closing of popups
+# When clicking a marker that is visible in the slot between the currently
+# open popup and its' marker, the corresponding popup will not open. This
+# happens due to the wrapper of the popup, which also includes the tip of
+# the popup in its height. At this functionality is part of how mapbox
+# handles popups, I am not currently aware of a more elegant way to fix this.
+@fixHeightOfPopupWrapper = ->
+  @map.on 'popupopen', (event) ->
+    popup = $('.leaflet-popup')
+    popupHeight = $(popup.children()[1]).height()
+    popup.height(popupHeight)
+    popup.css('margin-bottom', 20)
