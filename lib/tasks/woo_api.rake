@@ -6,7 +6,7 @@ namespace :woo_api do
   end
 
   task load_new_sessions: :environment do
-    break_time = Session.pluck(:updated_at).last || (Time.current - 60 * 60 * 24)
+    break_time = Session.pluck(:posted_at).last || (Time.current - 60 * 60 * 24)
     break_time_reached = false
 
     (0..500).step(15).collect do |offset|
