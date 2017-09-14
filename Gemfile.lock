@@ -1,6 +1,5 @@
 GEM
   remote: https://rubygems.org/
-  remote: https://rails-assets.org/
   specs:
     actioncable (5.0.0.1)
       actionpack (= 5.0.0.1)
@@ -116,9 +115,6 @@ GEM
       bundler (>= 1.3.0, < 2.0)
       railties (= 5.0.0.1)
       sprockets-rails (>= 2.0.0)
-    rails-assets-leaflet (0.7.7)
-    rails-assets-leaflet.markercluster (0.5.0)
-      rails-assets-leaflet (>= 0.7.0)
     rails-dom-testing (2.0.1)
       activesupport (>= 4.2.0, < 6.0)
       nokogiri (~> 1.6.0)
@@ -196,8 +192,6 @@ DEPENDENCIES
   pry
   puma (~> 3.0)
   rails (~> 5.0.0, >= 5.0.0.1)
-  rails-assets-leaflet (= 0.7.7)!
-  rails-assets-leaflet.markercluster (= 0.5.0)!
   sass-rails (~> 5.0)
   slim
   spring
@@ -208,4 +202,4 @@ DEPENDENCIES
   whenever
 
 BUNDLED WITH
-   1.13.5
+   1.14.6

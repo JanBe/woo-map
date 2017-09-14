@@ -15,11 +15,6 @@ gem 'active_model_serializers'
 gem 'pry'
 gem 'whenever'
 
-source 'https://rails-assets.org' do
-  gem 'rails-assets-leaflet', '0.7.7'
-  gem 'rails-assets-leaflet.markercluster', '0.5.0'
-end
-
 group :development, :test do
   gem 'byebug', platform: :mri
 end
