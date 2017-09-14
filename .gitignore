@@ -10,6 +10,9 @@
 !/log/.keep
 !/tmp/.keep
 
+# Ignore node modules.
+/node_modules/*
+
 # dotenv
 /.env*
 !/.env.development.sample
